@@ -16,6 +16,10 @@ const screensCollections = getDirectories(`./src/screens`).map((screen) =>
   NAME_REGEX.exec(screen)[0].trimStart().trimEnd(),
 );
 
+const apiActionCollections = getDirectories(`./src/api/actions`).map((collection) =>
+  NAME_REGEX.exec(collection)[0].trimStart().trimEnd(),
+);
+
 const getPlaceholderPattern = (pattern) => new RegExp(`(\/\/ ${pattern})`, 's');
 
 const componentTypes = {
@@ -198,9 +202,60 @@ const apiActionsGenerator = () => ({
   },
 });
 
+const apiQueryGenerator = (toKebabCase) => ({
+  description: componentTypes.API_QUERY,
+  prompts: [
+    {
+      type: 'list',
+      name: 'collection',
+      message: 'API actions collection name?',
+      default: apiActionCollections[0],
+      choices: apiActionCollections.map((collection) => ({ name: collection, value: collection })),
+    },
+    {
+      type: 'input',
+      name: 'name',
+      message: 'API query action name?',
+      validate: (input) => input.length > 1 || 'API query action name cannot be empty!',
+    },
+    {
+      type: 'input',
+      name: 'path',
+      message: 'API query action path?',
+      default: (answers) => `/${answers.collection}/${toKebabCase(answers.name)}`,
+      validate: (input) => input.length > 1 || 'API query action path cannot be empty!',
+    },
+  ],
+  actions: function () {
+    return [
+      {
+        type: 'modify',
+        path: 'src/api/actions/{{collection}}/{{collection}}.types.ts',
+        pattern: getPlaceholderPattern('API_ACTION_TYPES'),
+        templateFile: 'plop-templates/apiQuery/apiQuery.types.hbs',
+      },
+      {
+        type: 'modify',
+        path: 'src/api/actions/{{collection}}/{{collection}}.queries.ts',
+        pattern: getPlaceholderPattern('QUERY_TYPE_IMPORTS'),
+        template: '{{pascalCase name}}Payload,\n  {{pascalCase name}}Response,\n  $1',
+      },
+      {
+        type: 'modify',
+        path: 'src/api/actions/{{collection}}/{{collection}}.queries.ts',
+        pattern: getPlaceholderPattern('QUERY_FUNCTIONS_SETUP'),
+        templateFile: 'plop-templates/apiQuery/apiQuery.hbs',
+      },
+    ];
+  },
+});
+
 module.exports = function (plop) {
+  const toKebabCase = plop.getHelper('kebabCase');
+
   plop.setGenerator(componentTypes.COMPONENT, componentGenerator());
   plop.setGenerator(componentTypes.SCREEN, screenGenerator());
   plop.setGenerator(componentTypes.REACT_CONTEXT, reactContextGenerator());
   plop.setGenerator(componentTypes.API_ACTIONS, apiActionsGenerator());
+  plop.setGenerator(componentTypes.API_QUERY, apiQueryGenerator(toKebabCase));
 };
