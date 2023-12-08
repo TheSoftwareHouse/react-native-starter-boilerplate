@@ -1,0 +1,17 @@
+import { renderHook } from '@testing-library/react-native';
+
+import { {{pascalCase name}}ContextController } from 'context/{{camelCase name}}/{{camelCase name}}ContextController/{{pascalCase name}}ContextController';
+
+import { use{{pascalCase name}} } from './use{{pascalCase name}}';
+
+describe('use{{pascalCase name}}', () => {
+  test('throws when context is unavailable', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const renderFn = () =>
+      renderHook(() => use{{pascalCase name}}(), {
+        wrapper: ({ children }) => <>{children}</>,
+      });
+    expect(renderFn).toThrow('{{pascalCase name}}Context must be within {{pascalCase name}}Provider');
+  });
+});

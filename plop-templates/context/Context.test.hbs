@@ -1,0 +1,23 @@
+import { render, screen } from '@testing-library/react-native';
+import { Text, View } from 'react-native';
+
+import { {{pascalCase name}}Context } from './{{pascalCase name}}Context';
+
+describe('{{pascalCase name}}Context', () => {
+  test('is undefined by default', () => {
+    render(
+      <{{pascalCase name}}Context.Consumer>
+        {(context) => (
+          <View>
+            <Text testID="context">{typeof context}</Text>
+          </View>
+        )}
+      </{{pascalCase name}}Context.Consumer>,
+      {
+        wrapper: ({ children }) => <>{children}</>,
+      },
+    );
+
+    expect(screen.getByTestId('context')).toHaveTextContent('undefined');
+  });
+});
