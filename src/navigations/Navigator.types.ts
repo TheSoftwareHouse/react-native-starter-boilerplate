@@ -1,3 +1,5 @@
+import { StackScreenProps } from '@react-navigation/stack';
+
 export type RootStackParamList = {
   Home: undefined;
   Profile: undefined;
@@ -11,3 +13,5 @@ export type TabParamList = {
   Details: undefined;
   Settings: undefined;
 };
+
+export type RootStackScreenProps<T extends keyof RootStackParamList> = StackScreenProps<RootStackParamList, T>;
