@@ -17,7 +17,7 @@ export const useQuery = <Key extends keyof AxiosQueriesType, TError = unknown>(
   const result = useRQQuery(
     queryKey,
     async () => await queryFn(args),
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options as any,
   ) as UseQueryResult<DataForQuery<Key>, TError>;
 

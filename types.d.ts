@@ -1,4 +1,4 @@
-import { RootStackParamList, TabParamList } from './src/navigations/Navigator.types';
+import { RootStackParamList } from './src/navigations/Navigator.types';
 
 declare global {
   namespace ReactNavigation {

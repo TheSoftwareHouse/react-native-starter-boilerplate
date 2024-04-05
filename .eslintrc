@@ -1,10 +1,5 @@
 {
-  "extends": [
-    "plugin:prettier/recommended",
-    "@react-native",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["plugin:prettier/recommended", "@react-native", "plugin:@typescript-eslint/recommended", "prettier"],
   "plugins": ["prettier", "react", "react-native", "@typescript-eslint", "eslint-plugin-import"],
   "rules": {
     "prettier/prettier": [
@@ -66,6 +61,12 @@
             "allowExpressions": true
           }
         ]
+      }
+    },
+    {
+      "files": ["*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
       }
     }
   ]

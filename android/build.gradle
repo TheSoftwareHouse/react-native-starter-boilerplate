@@ -4,8 +4,8 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 34
         targetSdkVersion = 34
-        kotlinVersion = '1.9.0'
         ndkVersion = "25.1.8937393"
+        kotlinVersion = '1.9.0'
     }
     repositories {
         google()
@@ -18,15 +18,13 @@ buildscript {
         classpath 'com.google.gms:google-services:4.3.15'
     }
 }
-apply plugin: "com.facebook.react.rootproject"
 
+apply plugin: "com.facebook.react.rootproject"
 
 allprojects {
     repositories {
-        google()
         maven {
             url("$rootDir/../node_modules/detox/Detox-android")
         }
-        mavenCentral()
     }
- }
+}
