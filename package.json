@@ -10,6 +10,7 @@
     "test": "jest",
     "lint": "tsc && eslint . --ext .js,.jsx,.ts,.tsx",
     "postinstall": "npx patch-package",
+    "clean": "react-native clean --include android,cocoapods,metro,npm,watchman,yarn",
     "e2e:build-android-debug": "detox build -c android.emu.debug",
     "e2e:build-android-release": "detox build -c android.emu.release",
     "e2e:run-android-debug": "detox test -c android.emu.debug",
