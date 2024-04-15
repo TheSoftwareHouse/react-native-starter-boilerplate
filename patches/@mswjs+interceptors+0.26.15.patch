@@ -1,0 +1,19 @@
+diff --git a/node_modules/@mswjs/interceptors/lib/browser/chunk-65PS3XCB.js b/node_modules/@mswjs/interceptors/lib/browser/chunk-65PS3XCB.js
+index e4f824e..c8c5308 100644
+--- a/node_modules/@mswjs/interceptors/lib/browser/chunk-65PS3XCB.js
++++ b/node_modules/@mswjs/interceptors/lib/browser/chunk-65PS3XCB.js
+@@ -455,6 +455,14 @@ var XMLHttpRequestController = class {
+         readNextResponseBodyChunk();
+       };
+       readNextResponseBodyChunk();
++    } else if (response._bodyInit) {
++      // https://github.com/mswjs/msw/issues/2026#issuecomment-2047478115
++      this.logger.info('mocked response has _bodyInit, faking streaming...')
++
++      const bodyInit = response._bodyInit
++      const encoder = new TextEncoder()
++      this.responseBuffer = encoder.encode(bodyInit)
++      finalizeResponse()
+     } else {
+       finalizeResponse();
+     }

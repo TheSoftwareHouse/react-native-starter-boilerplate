@@ -1,4 +1,4 @@
-import { rest as baseRest } from 'msw';
+import { http as baseRest } from 'msw';
 import Config from 'react-native-config';
 
 const BASE_URL = Config.BASE_API_URL;

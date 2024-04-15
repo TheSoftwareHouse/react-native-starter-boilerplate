@@ -1,5 +1,4 @@
 name: Lint & Test
-
 on: pull_request
 
 jobs:
@@ -11,8 +10,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
           cache: 'yarn'
+          node-version-file: .node-version
 
       - name: Install
         run: yarn install --frozen-lockfile
@@ -22,3 +21,13 @@ jobs:
 
       - name: Test
         run: yarn test
+
+  e2e-ios:
+    needs: build
+    if: contains(github.event.pull_request.labels.*.name, 'e2e')
+    uses: ./.github/workflows/e2e_ios.yml
+
+  e2e-android:
+    needs: build
+    if: contains(github.event.pull_request.labels.*.name, 'e2e')
+    uses: ./.github/workflows/e2e_android.yml

@@ -3,6 +3,7 @@ declare module 'react-native-config' {
     BASE_API_URL?: string;
     AUTH_STORAGE_KEY?: string;
     DEFAULT_LOCALE?: string;
+    MOCK_API?: string;
   }
 
   export const Config: NativeConfig;
