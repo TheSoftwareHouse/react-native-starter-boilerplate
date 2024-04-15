@@ -4,6 +4,7 @@ declare module 'react-native-config' {
     AUTH_STORAGE_KEY?: string;
     DEFAULT_LOCALE?: string;
     MOCK_API?: string;
+    STORYBOOK_ENABLED?: string;
   }
 
   export const Config: NativeConfig;
