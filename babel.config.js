@@ -9,6 +9,12 @@ module.exports = {
       },
     ],
     'nativewind/babel',
+    [
+      'transform-inline-environment-variables',
+      {
+        include: ['NODE_ENV', 'STORYBOOK_ENABLED'],
+      },
+    ],
     'react-native-reanimated/plugin',
   ],
 };

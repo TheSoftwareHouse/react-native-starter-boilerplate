@@ -103,8 +103,7 @@ You can read more about the react navigation at: https://reactnavigation.org/doc
 
 To open storybook:
 
-1. Define the `STORYBOOK_ENABLED=true` env in your local `.env` file
-1. Start metro bundler using `yarn start` or `yarn start-cache`
+1. Start metro bundler using `yarn storybook`
 1. Run ios/android build using `yarn ios` or `yarn android`
 
 ## Troubleshooting
