@@ -1,0 +1,74 @@
+name: Android Staging Build
+
+# Manual deployment
+on: workflow_dispatch
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'yarn'
+          node-version-file: .node-version
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Make .env file
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_BASE_API_URL: ${{ vars.BASE_API_URL }}
+          envkey_AUTH_STORAGE_KEY: ${{ vars.AUTH_STORAGE_KEY }}
+          envkey_DEFAULT_LOCALE: ${{ vars.DEFAULT_LOCALE }}
+          envkey_MOCK_API: ${{ vars.MOCK_API }}
+
+      # Update Google Service File
+      #   - name: Setup Firebase File
+      #     run: echo "${{ secrets.PROD_ANDROID_FIREBASE_FILE }}" > ./android/app/google-services.json
+
+      # Setup Production Keystore file
+      #   - name: Setup Keystore File
+      #     run: echo "${{secrets.ANDROID_KEYSTORE_FILE}}" | base64 -d > "${{ github.workspace }}/production.keystore"
+
+      # Setup Firebase Service Account file
+      #   - name: Setup Service Account Credential Files
+      #     run: echo "${{secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}" > "${{ github.workspace }}/firebase-service-account.json"
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Setup Git Config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+      - name: Build and Upload to Firebase
+        uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: 'android staging'
+        env:
+          #   ANDROID_KEYSTORE_FILE: '${{ github.workspace }}/production.keystore'
+          #   ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          #   ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          #   Not required if you define service_credentials_file in the Fastfile
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Archive build
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging_apk
+          path: android/app/build/outputs/apk/**/*.apk

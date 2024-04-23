@@ -28,18 +28,18 @@ iOS deploy to TestFlight
 
 ## Android
 
-### android android_staging
+### android staging
 
 ```sh
-[bundle exec] fastlane android android_staging
+[bundle exec] fastlane android staging
 ```
 
 Android assemble release version
 
-### android android_release_bundle
+### android release_bundle
 
 ```sh
-[bundle exec] fastlane android android_release_bundle
+[bundle exec] fastlane android release_bundle
 ```
 
 Android bundle release version
