@@ -30,21 +30,22 @@ end
 
 
 platform :android do
-    desc "Android assemble release version"
-    lane :staging do 
-        increment_version_code(gradle_file_path: 'android/app/build.gradle')
+    desc "Android deploy to Firebase"
+    lane :staging do
+        latest_release = firebase_app_distribution_get_latest_release(
+            app: ENV["FIREBASE_ANDROID_APP_ID"]
+        )
+        increment_version_code(gradle_file_path: 'android/app/build.gradle', version_code: latest_release[:buildVersion].to_i + 1)
         gradle(task: 'clean', project_dir: './android/')
-        gradle(task: 'assemble' ,build_type: 'Release', project_dir: './android')
+        gradle(task: 'assemble', build_type: 'Release', project_dir: './android')
         firebase_app_distribution(
             app: ENV["FIREBASE_ANDROID_APP_ID"],
             groups: "qa-test",
             firebase_cli_token: ENV["FIREBASE_TOKEN"]
             # In your project use service_credentials_file instead of firebase_cli_token as it's a recommended solution
             # service_credentials_file: File.absolute_path('../firebase-service-account.json'),
-          )
-        git_commit(path: "./android", message: "Bump build version for Android")
-        push_to_git_remote
-    end   
+        )
+    end
 
     desc "Android bundle release version"
     lane :release_bundle do 

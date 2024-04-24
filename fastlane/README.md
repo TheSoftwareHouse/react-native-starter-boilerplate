@@ -34,7 +34,7 @@ iOS deploy to TestFlight
 [bundle exec] fastlane android staging
 ```
 
-Android assemble release version
+Android deploy to Firebase
 
 ### android release_bundle
 
