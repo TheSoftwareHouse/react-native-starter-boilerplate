@@ -472,7 +472,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8S95LUGZZP;
 				ENABLE_BITCODE = NO;
@@ -507,7 +507,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8S95LUGZZP;
 				INFOPLIST_FILE = ReactNativeStarter/Info.plist;
@@ -525,7 +525,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.tshdev.reactnativestarter;
 				PRODUCT_NAME = ReactNativeStarter;
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore io.tshdev.reactnativestarter";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore io.tshdev.reactnativestarter";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

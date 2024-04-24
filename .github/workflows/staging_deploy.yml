@@ -1,0 +1,44 @@
+name: Deploy app to staging
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'yarn'
+          node-version-file: .node-version
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
+  e2e-ios:
+    needs: lint-and-test
+    uses: ./.github/workflows/e2e_ios.yml
+
+  e2e-android:
+    needs: lint-and-test
+    uses: ./.github/workflows/e2e_android.yml
+
+  deploy-ios:
+    needs: e2e-ios
+    secrets: inherit
+    uses: ./.github/workflows/staging_build_ios.yml
+
+  deploy-android:
+    needs: e2e-android
+    secrets: inherit
+    uses: ./.github/workflows/staging_build_android.yml

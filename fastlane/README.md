@@ -15,10 +15,18 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios ios_staging
+### ios staging
 
 ```sh
-[bundle exec] fastlane ios ios_staging
+[bundle exec] fastlane ios staging
+```
+
+iOS deploy to Firebase
+
+### ios beta
+
+```sh
+[bundle exec] fastlane ios beta
 ```
 
 iOS deploy to TestFlight

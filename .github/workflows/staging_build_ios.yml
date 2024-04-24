@@ -1,4 +1,4 @@
-name: Android Staging Build
+name: iOS Staging Build
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     environment: staging
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +16,11 @@ jobs:
           cache: 'yarn'
           node-version-file: .node-version
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          distribution: temurin
-          java-version: 17
+          ruby-version: '3.2'
+          bundler-cache: true
 
       - name: Make .env file
         uses: SpicyPizza/create-envfile@v2.0
@@ -31,25 +31,27 @@ jobs:
           envkey_MOCK_API: ${{ vars.MOCK_API }}
 
       # Update Google Service File
-      #   - name: Setup Firebase File
-      #     run: echo "${{ secrets.PROD_ANDROID_FIREBASE_FILE }}" > ./android/app/google-services.json
-
-      # Setup Production Keystore file
-      #   - name: Setup Keystore File
-      #     run: echo "${{secrets.ANDROID_KEYSTORE_FILE}}" | base64 -d > "${{ github.workspace }}/production.keystore"
+      # - name: Setup Firebase File
+      #   run: echo "${{ secrets.IOS_FIREBASE_FILE }}" > ./ios/GoogleService-Info.plist
 
       # Setup Firebase Service Account file
       #   - name: Setup Service Account Credential Files
       #     run: echo "${{secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}" > "${{ github.workspace }}/firebase-service-account.json"
 
       - name: Install
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Cache CocoaPods
+        id: cache-cocoapods
+        uses: actions/cache@v4
         with:
-          ruby-version: '3.2'
-          bundler-cache: true
+          path: ios/Pods
+          key: ${{ runner.os }}-${{ runner.arch }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-pods-
+
+      - name: Install CocoaPods
+        run: cd ios ; pod install ; cd -
 
       - name: Setup Git Config
         run: |
@@ -59,17 +61,13 @@ jobs:
       - name: Build and Upload to Firebase
         uses: maierj/fastlane-action@v3.1.0
         with:
-          lane: 'android staging'
+          lane: 'ios staging'
         env:
-          #   ANDROID_KEYSTORE_FILE: '${{ github.workspace }}/production.keystore'
-          #   ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          #   ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
-          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          # FASTLANE_USER & FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD required if deploying to testflight -> lane: 'ios beta'
+          # FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          # FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          FIREBASE_IOS_APP_ID: ${{ secrets.FIREBASE_IOS_APP_ID }}
           #   Not required if you define service_credentials_file in the Fastfile
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
-      - name: Archive build
-        uses: actions/upload-artifact@v4
-        with:
-          name: staging_apk
-          path: android/app/build/outputs/apk/**/*.apk

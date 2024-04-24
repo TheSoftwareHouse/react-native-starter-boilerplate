@@ -1,61 +1,85 @@
-before_all do 
-    # This will be uncomment on final version, for now, dev purposes is commented
-    # By ensure git branch you can set specific branch for build your app
-    # ensure_git_branch
-    # ensure_git_status_clean
-    git_pull
+before_all do
+  # This will be uncomment on final version, for now, dev purposes is commented
+  # By ensure git branch you can set specific branch for build your app
+  # ensure_git_branch
+  # ensure_git_status_clean
+  git_pull
 end
-
 
 platform :ios do
-    private_lane :ios_staging_build do
-        increment_build_number(xcodeproj: './ios/ReactNativeStarter.xcodeproj')
-        gym(scheme: 'ReactNativeStarter', workspace: './ios/ReactNativeStarter.xcworkspace', export_options: {
-            provisioningProfiles: {
-            # "io.tshdev.reactnativestarter" => "match Development io.tshdev.reactnativestarter"
-            "io.tshdev.reactnativestarter" => "match AppStore io.tshdev.reactnativestarter"
-            }
-            })
-    end
+  desc "iOS deploy to Firebase"
+  lane :staging do
+    setup_ci if ENV["CI"]
+    match(type: "adhoc", app_identifier: "io.tshdev.reactnativestarter")
+    latest_release = firebase_app_distribution_get_latest_release(
+      app: ENV["FIREBASE_IOS_APP_ID"],
+    )
+    increment_build_number(xcodeproj: "./ios/ReactNativeStarter.xcodeproj", build_number: latest_release ? latest_release[:buildVersion].to_i + 1 : 1)
+    update_project_provisioning(
+      xcodeproj: "./ios/ReactNativeStarter.xcodeproj",
+      target_filter: "^ReactNativeStarter$",
+      profile: ENV["sigh_io.tshdev.reactnativestarter_adhoc_profile-path"],
+      build_configuration: "Release",
+    )
+    build_app(scheme: "ReactNativeStarter", workspace: "./ios/ReactNativeStarter.xcworkspace", export_method: "ad-hoc",
+              export_options: {
+                provisioningProfiles: {
+                  "io.tshdev.reactnativestarter" => "match AdHoc io.tshdev.reactnativestarter",
+                },
+              })
+    firebase_app_distribution(
+      app: ENV["FIREBASE_IOS_APP_ID"],
+      groups: "qa-test",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      # In your project use service_credentials_file instead of firebase_cli_token as it's a recommended solution
+      # service_credentials_file: File.absolute_path('../firebase-service-account.json'),
+    )
+    clean_build_artifacts
+  end
 
-    desc "iOS deploy to TestFlight"
-    lane :ios_staging do
-        ios_staging_build
-        upload_to_testflight(skip_waiting_for_build_processing: true, app_identifier: 'io.tshdev.reactnativestarter' )
-        clean_build_artifacts
-        commit_version_bump(message: 'Bump build version for iOS', xcodeproj: './ios/ReactNativeStarter.xcodeproj', force: true)
-        push_to_git_remote
-    end   
+  desc "iOS deploy to TestFlight"
+  lane :beta do
+    setup_ci if ENV["CI"]
+    match(type: "appstore")
+    increment_build_number(xcodeproj: "./ios/ReactNativeStarter.xcodeproj")
+    build_app(scheme: "ReactNativeStarter", workspace: "./ios/ReactNativeStarter.xcworkspace", export_method: "app-store",
+              export_options: {
+                provisioningProfiles: {
+                  "io.tshdev.reactnativestarter" => "match AppStore io.tshdev.reactnativestarter",
+                },
+              })
+    upload_to_testflight(skip_waiting_for_build_processing: true, app_identifier: "io.tshdev.reactnativestarter")
+    clean_build_artifacts
+    commit_version_bump(message: "Bump build version for iOS", xcodeproj: "./ios/ReactNativeStarter.xcodeproj", force: true)
+    push_to_git_remote
+  end
 end
-
 
 platform :android do
-    desc "Android deploy to Firebase"
-    lane :staging do
-        latest_release = firebase_app_distribution_get_latest_release(
-            app: ENV["FIREBASE_ANDROID_APP_ID"]
-        )
-        increment_version_code(gradle_file_path: 'android/app/build.gradle', version_code: latest_release[:buildVersion].to_i + 1)
-        gradle(task: 'clean', project_dir: './android/')
-        gradle(task: 'assemble', build_type: 'Release', project_dir: './android')
-        firebase_app_distribution(
-            app: ENV["FIREBASE_ANDROID_APP_ID"],
-            groups: "qa-test",
-            firebase_cli_token: ENV["FIREBASE_TOKEN"]
-            # In your project use service_credentials_file instead of firebase_cli_token as it's a recommended solution
-            # service_credentials_file: File.absolute_path('../firebase-service-account.json'),
-        )
-    end
+  desc "Android deploy to Firebase"
+  lane :staging do
+    latest_release = firebase_app_distribution_get_latest_release(
+      app: ENV["FIREBASE_ANDROID_APP_ID"],
+    )
+    increment_version_code(gradle_file_path: "android/app/build.gradle", version_code: latest_release ? latest_release[:buildVersion].to_i + 1 : 1)
+    gradle(task: "clean", project_dir: "./android/")
+    gradle(task: "assemble", build_type: "Release", project_dir: "./android")
+    firebase_app_distribution(
+      app: ENV["FIREBASE_ANDROID_APP_ID"],
+      groups: "qa-test",
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      # In your project use service_credentials_file instead of firebase_cli_token as it's a recommended solution
+      # service_credentials_file: File.absolute_path('../firebase-service-account.json'),
+    )
+  end
 
-    desc "Android bundle release version"
-    lane :release_bundle do 
-        increment_version_code(gradle_file_path: 'android/app/build.gradle')
-        gradle(task: 'clean', project_dir: './android/')
-        gradle(task: 'bundle' ,build_type: 'Release', project_dir: './android')
-        #  These lines can be removed after Google Play Account is connected
-        # git_commit(path: "./android", message: "Build release bundle for Android")
-        # upload_to_play_store
-    end   
-  
+  desc "Android bundle release version"
+  lane :release_bundle do
+    increment_version_code(gradle_file_path: "android/app/build.gradle")
+    gradle(task: "clean", project_dir: "./android/")
+    gradle(task: "bundle", build_type: "Release", project_dir: "./android")
+    #  These lines can be removed after Google Play Account is connected
+    # git_commit(path: "./android", message: "Build release bundle for Android")
+    # upload_to_play_store
+  end
 end
-
