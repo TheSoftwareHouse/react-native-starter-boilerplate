@@ -1,5 +1,5 @@
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
+  presets: ['module:@react-native/babel-preset', 'nativewind/babel'],
   plugins: [
     [
       'module-resolver',
@@ -8,7 +8,6 @@ module.exports = {
         extensions: ['.ios.ts', '.ios.tsx', '.android.ts', '.android.tsx', '.ts', '.tsx', '.js', '.jsx', '.json'],
       },
     ],
-    'nativewind/babel',
     [
       'transform-inline-environment-variables',
       {

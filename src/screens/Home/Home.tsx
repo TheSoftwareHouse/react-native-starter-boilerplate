@@ -17,7 +17,7 @@ export const Home = () => {
     <View className="flex-1 items-center justify-center">
       {isAuthenticating && <Text>Loading...</Text>}
       {isAuthenticated ? (
-        <View className="g-2">
+        <View className="gap-2">
           <Translation id="home.helloWorld" values={{ name: user?.firstName }} className="text-xl text-center mb-3" />
           <Button label="Show users" onPress={() => navigation.navigate('Users')} testID="goToUsersButton" />
           <Button label="Go to Profile" onPress={() => navigation.navigate('Profile')} testID="goToProfileButton" />
@@ -27,19 +27,24 @@ export const Home = () => {
             <Button
               label="Switch language to EN"
               onPress={() => setLocale(AppLocale.en)}
-              buttonStyle="bg-transparent"
-              labelStyle="text-black"
+              buttonClassName="bg-transparent"
+              labelClassName="text-black"
             />
           )}
           {locale === AppLocale.en && (
             <Button
               label="Switch language to PL"
               onPress={() => setLocale(AppLocale.pl)}
-              buttonStyle="bg-transparent"
-              labelStyle="text-black"
+              buttonClassName="bg-transparent"
+              labelClassName="text-black"
             />
           )}
-          <Button label="Logout" onPress={() => logout()} buttonStyle="bg-transparent" labelStyle="text-black" />
+          <Button
+            label="Logout"
+            onPress={() => logout()}
+            buttonClassName="bg-transparent"
+            labelClassName="text-black"
+          />
         </View>
       ) : (
         <Button
