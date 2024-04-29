@@ -37,7 +37,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Setup Java
         uses: actions/setup-java@v3

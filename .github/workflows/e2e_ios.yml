@@ -19,7 +19,7 @@ jobs:
           node-version-file: .node-version
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Install macOS dependencies
         run: |

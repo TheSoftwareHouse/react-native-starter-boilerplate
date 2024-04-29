@@ -42,7 +42,7 @@ jobs:
       #     run: echo "${{secrets.FIREBASE_SERVICE_ACCOUNT_JSON}}" > "${{ github.workspace }}/firebase-service-account.json"
 
       - name: Install
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
