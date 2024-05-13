@@ -94,6 +94,42 @@ You can read more about the react navigation at: https://reactnavigation.org/doc
 
 ## Deployment
 
+1. Follow the fastlane [README](./fastlane/README.md) to install and configure fastlane locally (remember to change
+   repository URL in the [Matchfile](./fastlane/Matchfile) and generate all required certificates/profiles etc.).
+1. [Generate signing key](https://developer.android.com/studio/publish/app-signing#generate-key) for Android and update
+   the release signing config in [build.gradle](android/app/build.gradle) file.
+1. Update Identifier/Schema/Workspace/Provisioning profiles etc. names in the [Fastfile](./fastlane/Fastfile) to match
+   your desired project name.
+
+### Firebase distribution
+
+1. Set Up Firebase Project:
+
+   - Create a Firebase project through the [Firebase Console](https://console.firebase.google.com/).
+   - Add your Android and iOS apps to the Firebase project. Download and replace `google-services.json` for Android and
+     `GoogleService-Info.plist` for iOS.
+
+1. Generate
+   [Firebase Service Account credentials](https://firebase.google.com/docs/app-distribution/android/distribute-fastlane#service-acc-fastlane)
+   and use the JSON key to configure `firebase_app_distribution` in the [Fastfile](./fastlane/Fastfile).
+
+   _Alternatively you can use `FIREBASE_TOKEN` approach. You can generate the token by following
+   [this instruction.](https://firebase.google.com/docs/cli#sign-in-test-cli)_
+
+1. Set Up Environment Variables:
+
+   - In your CI or local environment define the following variables:
+     - `FIREBASE_ANDROID_APP_ID`
+     - `FIREBASE_IOS_APP_ID`
+     - `MATCH_PASSWORD`
+     - `MATCH_GIT_BASIC_AUTHORIZATION`
+     - `FIREBASE_SERVICE_ACCOUNT_JSON`
+     - `FIREBASE_TOKEN` (Not required if you define FIREBASE_SERVICE_ACCOUNT_JSON/service_credentials_file in the
+       [Fastfile](./fastlane/Fastfile) -> recommended solution)
+     - variables related to Android signing key
+
+1. Run fastlane command to deploy the app. Check Fastlane [README](./fastlane/README.md) for available actions.
+
 ### AppCenter
 
 - Environment variables need to have `RN_` prefix. For example if your variable is `BACKEND_URL`(in `.env` file) it
