@@ -24,7 +24,7 @@ export const AuthContextController = ({ children }: AuthContextControllerProps) 
     },
   );
 
-  const { mutateAsync: login, isLoading: isAuthenticating } = useMutation('loginMutation', {
+  const { mutateAsync: login, isPending: isAuthenticating } = useMutation('loginMutation', {
     onSuccess: (res) => {
       dispatch(
         setTokens({
@@ -45,12 +45,16 @@ export const AuthContextController = ({ children }: AuthContextControllerProps) 
     isLoadingAndEnabled,
     isSuccess: isUserSuccess,
     remove: resetUser,
+    isError: isUserError,
   } = useUser({
     enabled: !!state.accessToken,
-    onError: () => {
-      dispatch(resetTokens());
-    },
   });
+
+  useEffect(() => {
+    if (isUserError) {
+      dispatch(resetTokens());
+    }
+  }, [isUserError]);
 
   const logout = useCallback(() => {
     resetUser();
@@ -59,7 +63,7 @@ export const AuthContextController = ({ children }: AuthContextControllerProps) 
 
   useEffect(() => {
     setAuthStorage(state);
-  }, [state]);
+  }, [state, setAuthStorage]);
 
   const value: AuthContextValue = useMemo(
     () => ({

@@ -67,7 +67,7 @@ describe('useQuery', () => {
       ),
     });
 
-    expect(result.current.status).toBe('loading');
+    expect(result.current.status).toBe('pending');
     await waitFor(() => {
       expect(result.current.status).toBe('error');
     });

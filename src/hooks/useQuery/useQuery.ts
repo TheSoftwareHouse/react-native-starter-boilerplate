@@ -1,4 +1,5 @@
-import { QueryKey, UseQueryResult, UseQueryOptions, useQuery as useRQQuery } from '@tanstack/react-query';
+import { QueryKey, UseQueryOptions, useQuery as useRQQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 import { AxiosQueriesType, queries } from 'api/actions';
 import { DataForQuery, GetQueryParams } from 'api/types/types';
@@ -8,18 +9,25 @@ import { parseQueryKey } from 'utils/parseQueryKey';
 export const useQuery = <Key extends keyof AxiosQueriesType, TError = unknown>(
   query: Key,
   args: GetQueryParams<Key>,
-  options?: UseQueryOptions<DataForQuery<Key>, TError>,
+  options?: Omit<UseQueryOptions<DataForQuery<Key>, TError>, 'queryKey' | 'queryFn'>,
 ) => {
   const { client } = useApiClient();
+  const queryClient = useQueryClient();
   const queryFn = queries[query](client);
   const queryKey: QueryKey = parseQueryKey(query, args);
 
-  const result = useRQQuery(
+  const result = useRQQuery<DataForQuery<Key>, TError>({
     queryKey,
-    async () => await queryFn(args),
+    queryFn: async () => await queryFn(args),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    options as any,
-  ) as UseQueryResult<DataForQuery<Key>, TError>;
+    ...(options as any),
+  });
 
-  return { ...result, isLoadingAndEnabled: result.isLoading && result.fetchStatus !== 'idle' };
+  const remove = useCallback(() => queryClient.removeQueries({ queryKey }), [queryClient, queryKey]);
+
+  return {
+    ...result,
+    isLoadingAndEnabled: result.isLoading && result.fetchStatus !== 'idle',
+    remove,
+  };
 };

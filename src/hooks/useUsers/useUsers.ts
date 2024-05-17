@@ -5,6 +5,7 @@ export const useUsers = () =>
     'getUsersInfinite',
     {},
     {
+      initialPageParam: 0,
       getNextPageParam: ({ nextPage }) => {
         return nextPage;
       },

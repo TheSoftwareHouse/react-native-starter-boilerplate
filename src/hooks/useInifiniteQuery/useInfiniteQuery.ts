@@ -1,11 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import {
-  QueryKey,
-  useInfiniteQuery as useRQInfiniteQuery,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
-} from '@tanstack/react-query';
+import { QueryKey, useInfiniteQuery as useRQInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query';
 
 import { AxiosInfiniteQueriesType, queries } from 'api/actions';
 import { DataForQuery, GetQueryParams } from 'api/types/types';
@@ -20,15 +13,16 @@ import { useApiClient } from 'hooks/useApiClient/useApiClient';
 export const useInfiniteQuery = <Key extends keyof AxiosInfiniteQueriesType, TError = unknown>(
   query: Key,
   args?: GetQueryParams<Key>,
-  options?: UseInfiniteQueryOptions<DataForQuery<Key>, TError>,
+  options?: Omit<UseInfiniteQueryOptions<DataForQuery<Key>, TError>, 'queryKey' | 'queryFn'>,
 ) => {
   const { client } = useApiClient();
   const queryFn = queries[query](client);
   const queryKey: QueryKey = [query];
 
-  return useRQInfiniteQuery(
+  return useRQInfiniteQuery<DataForQuery<Key>, TError>({
     queryKey,
-    async ({ pageParam }: { pageParam?: string }) => await queryFn({ pageParam, ...(args || {}) }),
-    options as any,
-  ) as UseInfiniteQueryResult<DataForQuery<Key>, TError>;
+    queryFn: async ({ pageParam }: { pageParam?: string }) => await queryFn({ pageParam, ...(args || {}) }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...(options as any),
+  });
 };

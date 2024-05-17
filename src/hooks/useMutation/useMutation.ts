@@ -1,9 +1,4 @@
-import {
-  UseMutationResult,
-  useMutation as useRQMutation,
-  UseMutationOptions,
-  MutationKey,
-} from '@tanstack/react-query';
+import { useMutation as useRQMutation, UseMutationOptions, MutationKey } from '@tanstack/react-query';
 
 import { AxiosMutationsType, mutations } from 'api/actions';
 import { useApiClient } from 'hooks/useApiClient/useApiClient';
@@ -25,10 +20,10 @@ export const useMutation = <Key extends keyof AxiosMutationsType, TError = unkno
   const mutationFn = mutations[mutation](client);
   const mutationKey: MutationKey = [mutation];
 
-  return useRQMutation(
+  return useRQMutation<DataForMutation<Key>, TError, GetMutationParams<Key>>({
     mutationKey,
-    async (args) => await mutationFn(args),
+    mutationFn: async (args) => await mutationFn(args),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    options as any,
-  ) as UseMutationResult<DataForMutation<Key>, TError, GetMutationParams<Key>>;
+    ...(options as any),
+  });
 };

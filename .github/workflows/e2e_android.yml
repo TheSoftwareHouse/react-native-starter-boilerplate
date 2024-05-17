@@ -1,8 +1,5 @@
 name: E2E Android
 on:
-  push:
-    branches:
-      - master
   workflow_call:
 
 jobs:
